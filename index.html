@@ -200,7 +200,6 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 </head>
 <body>
 
-<div class="boot" aria-hidden="true"><div><img src="assets/avatar.webp" alt="" /><div class="bar"><i></i></div><span>Loading your portfolio <b>· buying temporarily disabled</b></span></div></div>
 
 <div class="room" id="room">
   <img class="fr f0" src="assets/f0.webp" alt="" />
@@ -302,7 +301,6 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   bgm.addEventListener('error', function(){ hasMusic = false; });
   function arm(){ if(armed) return; armed = true; if(hasMusic){ bgm.volume = .3; bgm.play().catch(function(){}); } }
   document.addEventListener('pointerdown', arm, true); document.addEventListener('keydown', arm, true);
-  var boot = document.querySelector('.boot'); setTimeout(function(){ if(boot) boot.remove(); }, 2900);
 
   /* ---- pain ---- */
   var pain = 0, extra = 0, root = document.documentElement, frames = [].slice.call(document.querySelectorAll('.room .fr')), pbar = document.getElementById('pbar'), pct = document.getElementById('pct'), app = document.getElementById('app'), ticket = document.getElementById('ticket');
@@ -369,7 +367,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   var cc = document.getElementById('confetti'), cg = cc.getContext('2d'), parts = [], raf = null;
   function confetti(n){ var W = innerWidth, H = innerHeight; cc.width = W; cc.height = H; var r = app.getBoundingClientRect(), ox = r.left + r.width / 2, oy = Math.max(80, Math.min(H - 80, r.top + 220)); var cols = ['#00c805', '#ffffff', '#ff5fa8', '#7cf59a', '#ff5000']; for(var i = 0; i < n; i++) parts.push({ x: ox, y: oy, vx: (Math.random() - .5) * 18, vy: -Math.random() * 14 - 4, g: .35 + Math.random() * .2, w: 6 + Math.random() * 6, h: 8 + Math.random() * 8, a: Math.random() * Math.PI, va: (Math.random() - .5) * .3, c: cols[i % cols.length], life: 90 + Math.random() * 40 }); if(!raf) raf = requestAnimationFrame(step); }
   function step(){ cg.clearRect(0, 0, cc.width, cc.height); parts = parts.filter(function(p){ return p.life > 0 && p.y < cc.height + 20; }); parts.forEach(function(p){ p.vy += p.g; p.vx *= .985; p.x += p.vx; p.y += p.vy; p.a += p.va; p.life--; cg.save(); cg.translate(p.x, p.y); cg.rotate(p.a); cg.globalAlpha = Math.min(1, p.life / 30); cg.fillStyle = p.c; cg.fillRect(-p.w / 2, -p.h / 2, p.w, p.h); cg.restore(); }); if(parts.length){ raf = requestAnimationFrame(step); } else { raf = null; cg.clearRect(0, 0, cc.width, cc.height); } }
-  setTimeout(function(){ confetti(140); toast('Congratulations', 'Your first loss on the new chain'); }, 3100);
+  setTimeout(function(){ confetti(140); toast('Congratulations', 'Your first loss on the new chain'); }, 900);
 
   /* ---- toasts, freeze, glitch ---- */
   var toasts = document.getElementById('toasts');
