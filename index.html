@@ -304,7 +304,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   var pain = 0, extra = 0, root = document.documentElement, frames = [].slice.call(document.querySelectorAll('.room .fr')), pbar = document.getElementById('pbar'), pct = document.getElementById('pct'), app = document.getElementById('app'), ticket = document.getElementById('ticket');
   function setPain(){
     var r = app.getBoundingClientRect(), total = Math.max(1, r.height - innerHeight * .6), sc = Math.min(1, Math.max(0, -r.top / total));
-    pain = Math.min(1, sc * .8 + extra);
+    pain = Math.min(1, sc * 1.15 + extra);
     root.style.setProperty('--pain', pain.toFixed(3));
     frames.forEach(function(f, i){ if(i === 0) return; f.style.opacity = Math.min(1, Math.max(0, pain * 3 - (i - 1))); });
     pbar.style.width = Math.round(pain * 100) + '%'; pct.textContent = Math.round(pain * 100) + '%';
