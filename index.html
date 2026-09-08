@@ -38,6 +38,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 .room .scan{position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(rgba(0,0,0,.2) 0 1px,transparent 1px 3px);opacity:.45}
 .room .vig{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 45% 50%,transparent 45%,rgba(10,10,13,.85) 100%)}
 .room .red{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 50%,transparent 40%,rgba(255,40,80,.55) 100%);opacity:calc(var(--pain) * .9)}
+.confetti{position:fixed;inset:0;z-index:44;pointer-events:none}
 .freeze{position:fixed;inset:0;z-index:40;pointer-events:none;background:rgba(10,10,13,.55);display:grid;place-items:center;opacity:0;transition:opacity .15s}
 .freeze.on{opacity:1}
 .freeze i{width:34px;height:34px;border:3px solid rgba(255,255,255,.2);border-top-color:var(--white);border-radius:50%;animation:spin .8s linear infinite}
@@ -123,6 +124,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 
 .hist{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;padding:6px 18px 18px}
 .hist .h{position:relative;overflow:hidden;border-radius:14px;border:1px solid var(--line);aspect-ratio:16/10;cursor:pointer;background:#000}
+.hist .h.wide{grid-column:1/-1;aspect-ratio:16/8}
 .hist .h img{width:100%;height:100%;object-fit:cover;transition:transform .6s ease}
 .hist .h:hover img{transform:scale(1.05)}
 .hist .h span{position:absolute;left:10px;right:10px;bottom:9px;font-size:11.5px;font-weight:500;line-height:1.3;text-shadow:0 1px 4px rgba(0,0,0,.9)}
@@ -208,6 +210,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   <div class="glowG"></div><div class="glowR"></div><div class="scan"></div><div class="vig"></div><div class="red"></div>
 </div>
 <div class="freeze" id="freeze"><i></i></div>
+<canvas class="confetti" id="confetti"></canvas>
 <div class="toasts" id="toasts"></div>
 
 <div class="wrap">
@@ -215,8 +218,8 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
     <div class="brand"><img src="assets/avatar.webp" alt="" /><span data-name>Pink Wojak</span></div>
     <div class="mark">
       <h1 class="glitch" data-t="PINK WOJAK">PINK<br /><em>WOJAK</em></h1>
-      <p>Born on a phone screen in January 2021, same portfolio, new chain</p>
-      <div class="year"><i></i>Account open since 2021 · never closed</div>
+      <p>He wears the hat, the hat did not help, same portfolio since January 2021</p>
+      <div class="year"><i></i>Sherwood branch · account open since 2021</div>
     </div>
     <div class="foot">Robinhood Chain · Pons · every position red, one green</div>
   </aside>
@@ -254,6 +257,7 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
 
     <div class="sec">History <span>2021 → now</span></div>
     <div class="hist">
+      <div class="h wide" data-src="assets/s6.webp" data-cap="Sherwood, he took from the rich and gave to the poor, he was the poor"><img src="assets/s6.webp" alt="" /><small>SHERWOOD</small><span>Took from the rich, gave to the poor, he was the poor</span></div>
       <div class="h" data-src="assets/s2.webp" data-cap="January 2021, he bought the top from the kitchen"><img src="assets/s2.webp" alt="" /><small>JAN 2021</small><span>He bought the top from the kitchen</span></div>
       <div class="h" data-src="assets/s3.webp" data-cap="The buy button turned grey, the sell button stayed green"><img src="assets/s3.webp" alt="" /><small>JAN 28</small><span>The buy button turned grey</span></div>
       <div class="h" data-src="assets/s4.webp" data-cap="Sunrise, still holding, still pink"><img src="assets/s4.webp" alt="" /><small>EVERY MORNING</small><span>Still holding, still pink</span></div>
@@ -358,8 +362,14 @@ button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
   /* ---- sell ---- */
   var sellBtn = document.getElementById('sellAll'), rej = document.getElementById('rej'), rejN = 0;
   var sellLines = ['Your sell order could not be placed', 'Market is closed for you specifically', 'Sell button is thinking about it', 'Order rejected, try holding', 'Selling is temporarily disabled too'];
-  sellBtn.addEventListener('click', function(){ sellBtn.classList.remove('shake'); void sellBtn.offsetWidth; sellBtn.classList.add('shake'); rejN++; rej.textContent = rejN; extra = Math.min(.5, extra + .1); setPain(); toast('Order rejected', sellLines[rejN % sellLines.length]); freeze(600); glitchNow(); });
+  sellBtn.addEventListener('click', function(){ sellBtn.classList.remove('shake'); void sellBtn.offsetWidth; sellBtn.classList.add('shake'); rejN++; rej.textContent = rejN; extra = Math.min(.5, extra + .1); setPain(); toast('Order rejected', sellLines[rejN % sellLines.length]); freeze(600); glitchNow(); confetti(90); });
   document.querySelectorAll('.row2:not(.ours) .b').forEach(function(b){ b.addEventListener('click', function(){ toast('Buying temporarily disabled', 'This asset cannot be bought right now'); }); });
+
+  /* ---- confetti, the app's famous one ---- */
+  var cc = document.getElementById('confetti'), cg = cc.getContext('2d'), parts = [], raf = null;
+  function confetti(n){ var W = innerWidth, H = innerHeight; cc.width = W; cc.height = H; var r = app.getBoundingClientRect(), ox = r.left + r.width / 2, oy = Math.max(80, Math.min(H - 80, r.top + 220)); var cols = ['#00c805', '#ffffff', '#ff5fa8', '#7cf59a', '#ff5000']; for(var i = 0; i < n; i++) parts.push({ x: ox, y: oy, vx: (Math.random() - .5) * 18, vy: -Math.random() * 14 - 4, g: .35 + Math.random() * .2, w: 6 + Math.random() * 6, h: 8 + Math.random() * 8, a: Math.random() * Math.PI, va: (Math.random() - .5) * .3, c: cols[i % cols.length], life: 90 + Math.random() * 40 }); if(!raf) raf = requestAnimationFrame(step); }
+  function step(){ cg.clearRect(0, 0, cc.width, cc.height); parts = parts.filter(function(p){ return p.life > 0 && p.y < cc.height + 20; }); parts.forEach(function(p){ p.vy += p.g; p.vx *= .985; p.x += p.vx; p.y += p.vy; p.a += p.va; p.life--; cg.save(); cg.translate(p.x, p.y); cg.rotate(p.a); cg.globalAlpha = Math.min(1, p.life / 30); cg.fillStyle = p.c; cg.fillRect(-p.w / 2, -p.h / 2, p.w, p.h); cg.restore(); }); if(parts.length){ raf = requestAnimationFrame(step); } else { raf = null; cg.clearRect(0, 0, cc.width, cc.height); } }
+  setTimeout(function(){ confetti(140); toast('Congratulations', 'Your first loss on the new chain'); }, 3100);
 
   /* ---- toasts, freeze, glitch ---- */
   var toasts = document.getElementById('toasts');
