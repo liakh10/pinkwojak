@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<script src="config.js"></script>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Pink Wojak</title>
+<meta name="description" content="Born on a phone screen in January 2021, same portfolio, new chain" />
+<link rel="icon" type="image/png" href="assets/favicon.png" />
+<link rel="apple-touch-icon" href="assets/apple-icon.png" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet" />
+<style>
+:root{
+  --bg:#0a0a0d; --panel:rgba(16,16,22,.82); --panel-2:rgba(24,24,32,.9); --line:rgba(255,255,255,.08); --white:#f4f4f7; --dim:#8b8b99;
+  --green:#00c805; --red:#ff5000; --pink:#ff5fa8; --pink-d:#c2367c;
+  --sans:"Inter",system-ui,sans-serif; --mono:"IBM Plex Mono",ui-monospace,monospace;
+  --pad:clamp(14px,2.6vw,34px);
+  --pain:0;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html{scroll-behavior:smooth;overflow-x:hidden}
+body{background:var(--bg);color:var(--white);font-family:var(--sans);font-size:14px;line-height:1.5;-webkit-font-smoothing:antialiased;overflow-x:hidden}
+img,video,canvas{display:block;max-width:100%}
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer}
+
+/* ================= THE ROOM (fixed scene, frames crossfade with pain) ================= */
+.room{position:fixed;inset:0;z-index:0;overflow:hidden;background:#000}
+.room .fr{position:absolute;inset:-4%;width:108%;height:108%;object-fit:cover;object-position:50% 45%;opacity:0;animation:kb 26s ease-in-out infinite alternate}
+.room .fr.f0{opacity:1}
+@keyframes kb{from{transform:scale(1) translate(0,0)}to{transform:scale(1.06) translate(-1%,1%)}}
+.room .glowG,.room .glowR{position:absolute;inset:0;pointer-events:none;mix-blend-mode:screen;animation:flick 2.8s steps(6,end) infinite}
+.room .glowG{background:radial-gradient(ellipse 22% 26% at 46% 62%,rgba(0,255,90,.28),transparent 70%);opacity:calc(1 - var(--pain))}
+.room .glowR{background:radial-gradient(ellipse 24% 28% at 46% 62%,rgba(255,40,80,.34),transparent 70%);opacity:var(--pain);animation-duration:1.6s}
+@keyframes flick{0%,100%{filter:brightness(1)}20%{filter:brightness(.7)}45%{filter:brightness(1.15)}70%{filter:brightness(.85)}}
+.room .scan{position:absolute;inset:0;pointer-events:none;background:repeating-linear-gradient(rgba(0,0,0,.2) 0 1px,transparent 1px 3px);opacity:.45}
+.room .vig{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 45% 50%,transparent 45%,rgba(10,10,13,.85) 100%)}
+.room .red{position:absolute;inset:0;pointer-events:none;background:radial-gradient(ellipse at 50% 50%,transparent 40%,rgba(255,40,80,.55) 100%);opacity:calc(var(--pain) * .9)}
+.freeze{position:fixed;inset:0;z-index:40;pointer-events:none;background:rgba(10,10,13,.55);display:grid;place-items:center;opacity:0;transition:opacity .15s}
+.freeze.on{opacity:1}
+.freeze i{width:34px;height:34px;border:3px solid rgba(255,255,255,.2);border-top-color:var(--white);border-radius:50%;animation:spin .8s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ================= LAYOUT ================= */
+.wrap{position:relative;z-index:2;width:min(1180px,100%);margin:0 auto;padding:0 var(--pad);display:grid;grid-template-columns:minmax(0,1fr) 440px;gap:clamp(20px,4vw,60px);align-items:start}
+.side{position:sticky;top:0;height:100svh;display:flex;flex-direction:column;justify-content:space-between;padding:var(--pad) 0}
+.side .brand{display:flex;align-items:center;gap:10px;font-weight:600;font-size:14px}
+.side .brand img{width:30px;height:30px;border-radius:50%;border:1px solid var(--line)}
+.side .brand span{letter-spacing:.06em;text-transform:uppercase}
+.mark h1{font-weight:700;font-size:clamp(46px,6.4vw,96px);line-height:.92;letter-spacing:-.04em;color:var(--white)}
+.mark h1 em{font-style:normal;color:var(--pink);text-shadow:0 0 40px rgba(255,95,168,.45)}
+.mark p{margin-top:14px;font-size:15px;color:var(--white);opacity:.85;max-width:34ch}
+.mark .year{display:inline-flex;align-items:center;gap:8px;margin-top:16px;font-family:var(--mono);font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+.mark .year i{width:8px;height:8px;border-radius:50%;background:var(--red);box-shadow:0 0 10px var(--red);animation:blink 1.1s steps(1,end) infinite}
+@keyframes blink{50%{opacity:.15}}
+.side .foot{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
+
+/* ================= THE APP ================= */
+.app{position:relative;margin:var(--pad) 0;border-radius:26px;background:var(--panel);backdrop-filter:blur(14px);border:1px solid var(--line);box-shadow:0 40px 80px -30px rgba(0,0,0,.8),inset 0 1px 0 rgba(255,255,255,.06);overflow:hidden}
+.app::before{content:"";position:absolute;inset:0;pointer-events:none;border-radius:26px;box-shadow:inset 0 0 0 1px rgba(255,95,168,calc(var(--pain) * .6)),inset 0 0 60px rgba(255,80,0,calc(var(--pain) * .35));z-index:1}
+.top{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 16px;border-bottom:1px solid var(--line)}
+.top .who{display:flex;align-items:center;gap:10px;font-weight:600;font-size:13px}
+.top .who img{width:28px;height:28px;border-radius:50%}
+.btns{display:flex;gap:6px;flex-wrap:wrap}
+.chip{height:34px;display:inline-flex;align-items:center;justify-content:center;gap:6px;padding:0 13px;border-radius:999px;font-weight:600;font-size:12.5px;background:rgba(255,255,255,.07);color:var(--white);border:1px solid var(--line);transition:background .15s,transform .1s}
+.chip:hover{background:rgba(255,255,255,.14)}
+.chip:active{transform:translateY(1px)}
+.chip.buy{background:var(--green);color:#04120a;border-color:var(--green)}
+.chip.buy:hover{background:#19e21f}
+.chip svg{width:13px;height:13px}
+.chip img{width:20px;height:20px;border-radius:50%}
+
+.head{padding:18px 18px 8px}
+.head .lab{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--dim)}
+.head .val{font-family:var(--mono);font-weight:600;font-size:clamp(30px,3.4vw,40px);letter-spacing:-.02em;line-height:1.1;margin-top:4px;transition:color .3s}
+.head .chg{font-family:var(--mono);font-size:13px;margin-top:4px;color:var(--red)}
+.head .chg b{font-weight:500;color:var(--dim);margin-left:6px}
+.chart{position:relative;height:150px;margin:8px 0 0}
+.chart canvas{width:100%;height:100%}
+.chart .tag{position:absolute;right:14px;top:8px;font-family:var(--mono);font-size:11px;letter-spacing:.1em;color:var(--pink);opacity:0;transition:opacity .3s}
+.chart .tag.on{opacity:1}
+.tabs{display:flex;gap:4px;padding:8px 14px 14px;border-bottom:1px solid var(--line)}
+.tabs button{font-family:var(--mono);font-size:11.5px;letter-spacing:.06em;padding:5px 9px;border-radius:8px;color:var(--dim)}
+.tabs button.on{color:var(--white);background:rgba(255,80,0,.22)}
+.tabs button.y{color:var(--pink);margin-left:auto;border:1px solid rgba(255,95,168,.4)}
+
+.meter{padding:14px 18px;border-bottom:1px solid var(--line);display:grid;gap:8px}
+.meter .row{display:flex;justify-content:space-between;font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--dim)}
+.meter .row b{font-family:var(--mono);color:var(--pink);font-weight:500}
+.meter .bar{height:8px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden}
+.meter .bar i{display:block;height:100%;width:0;border-radius:999px;background:linear-gradient(90deg,#ffd1e6,var(--pink),var(--red));transition:width .4s ease}
+
+.sec{padding:14px 18px 6px;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);display:flex;justify-content:space-between;align-items:center}
+.sec span{font-family:var(--mono)}
+.pos{display:grid}
+.row2{display:grid;grid-template-columns:64px 1fr 84px auto;gap:10px;align-items:center;padding:11px 18px;border-top:1px solid var(--line);transition:background .3s}
+.row2:hover{background:rgba(255,255,255,.03)}
+.row2 .t{font-weight:700;font-size:14px;letter-spacing:.02em}
+.row2 .t small{display:block;font-weight:400;font-size:11px;color:var(--dim);letter-spacing:0}
+.row2 canvas{width:84px;height:30px}
+.row2 .p{font-family:var(--mono);font-size:13px;text-align:right}
+.row2 .p small{display:block;font-size:12px;color:var(--red)}
+.row2 .b{height:28px;padding:0 10px;border-radius:999px;font-size:11.5px;font-weight:600;letter-spacing:.04em;background:rgba(255,255,255,.06);color:var(--dim);border:1px solid var(--line);cursor:not-allowed;position:relative}
+.row2 .b::after{content:"Temporarily disabled";position:absolute;right:0;bottom:calc(100% + 6px);white-space:nowrap;font-size:11px;font-weight:500;padding:4px 8px;border-radius:6px;background:#1c1c24;color:var(--white);border:1px solid var(--line);opacity:0;pointer-events:none;transition:opacity .15s}
+.row2 .b:hover::after{opacity:1}
+.row2.ours{background:rgba(0,200,5,.07);border-top:1px solid rgba(0,200,5,.35)}
+.row2.ours .t{color:var(--green)}
+.row2.ours .p small{color:var(--green)}
+.row2.ours .b{background:var(--green);color:#04120a;border-color:var(--green);cursor:pointer}
+.row2.ours .b::after{display:none}
+.row2.ours .b:hover{background:#19e21f}
+
+.sell{padding:16px 18px;border-top:1px solid var(--line);display:grid;gap:8px;justify-items:center}
+.sell button{width:100%;height:50px;border-radius:14px;font-weight:700;font-size:15px;letter-spacing:.06em;text-transform:uppercase;background:var(--pink);color:#2a0716;box-shadow:0 0 0 0 rgba(255,95,168,.5);transition:transform .1s,box-shadow .3s}
+.sell button:hover{box-shadow:0 0 30px rgba(255,95,168,.45)}
+.sell button:active{transform:translateY(2px)}
+.sell button.shake{animation:shake .4s ease}
+@keyframes shake{0%,100%{transform:translateX(0)}20%{transform:translateX(-8px)}40%{transform:translateX(8px)}60%{transform:translateX(-5px)}80%{transform:translateX(5px)}}
+.sell .n{font-family:var(--mono);font-size:11.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--dim)}
+.sell .n b{color:var(--pink);font-weight:500}
+
+.hist{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;padding:6px 18px 18px}
+.hist .h{position:relative;overflow:hidden;border-radius:14px;border:1px solid var(--line);aspect-ratio:16/10;cursor:pointer;background:#000}
+.hist .h img{width:100%;height:100%;object-fit:cover;transition:transform .6s ease}
+.hist .h:hover img{transform:scale(1.05)}
+.hist .h span{position:absolute;left:10px;right:10px;bottom:9px;font-size:11.5px;font-weight:500;line-height:1.3;text-shadow:0 1px 4px rgba(0,0,0,.9)}
+.hist .h small{position:absolute;left:10px;top:8px;font-family:var(--mono);font-size:10px;letter-spacing:.12em;color:var(--pink)}
+
+.ticket{padding:18px;border-top:1px solid var(--line);display:grid;gap:12px;justify-items:center;text-align:center}
+.ticket .lab{font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
+.ca{display:grid;justify-items:center;gap:8px;width:100%;padding:14px 16px;border-radius:14px;background:#050507;color:var(--white);cursor:pointer;border:1px solid var(--line)}
+.ca .tag{font-size:11px;letter-spacing:.3em;color:var(--pink);font-weight:600}
+.ca .ca-val{font-family:var(--mono);font-weight:600;font-size:24px;letter-spacing:.04em;color:var(--white);white-space:nowrap;max-width:100%;line-height:1.1}
+.ca.live .ca-val{font-weight:500;font-size:clamp(10.5px,2.7vw,14px);letter-spacing:0;color:var(--green)}
+.ca .cp{font-size:11px;font-weight:600;letter-spacing:.14em;color:var(--white);padding:6px 12px;border-radius:999px;border:1px dashed rgba(255,255,255,.35)}
+.ca.live{box-shadow:0 0 0 2px var(--green),0 0 30px rgba(0,200,5,.35)}
+.ca.live .cp{border-style:solid;border-color:var(--green);color:var(--green)}
+.ticket .btns{justify-content:center}
+.end{padding:14px 18px 18px;display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;font-family:var(--mono);font-size:10.5px;letter-spacing:.12em;text-transform:uppercase;color:var(--dim)}
+
+/* toasts */
+.toasts{position:fixed;left:50%;top:14px;z-index:45;transform:translateX(-50%);display:grid;gap:8px;width:min(420px,calc(100% - 28px));pointer-events:none}
+.toast{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:14px;background:rgba(20,20,28,.92);backdrop-filter:blur(10px);border:1px solid var(--line);box-shadow:0 20px 40px -20px rgba(0,0,0,.8);animation:tin .35s cubic-bezier(.2,1.2,.4,1) both;font-size:13px}
+.toast.out{animation:tout .3s ease forwards}
+.toast img{width:28px;height:28px;border-radius:7px}
+.toast b{display:block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--dim);font-weight:600}
+@keyframes tin{from{opacity:0;transform:translateY(-16px) scale(.96)}to{opacity:1;transform:none}}
+@keyframes tout{to{opacity:0;transform:translateY(-10px)}}
+
+/* glitch */
+.glitch{position:relative}
+.glitch.on::before,.glitch.on::after{content:attr(data-t);position:absolute;left:0;top:0;width:100%;overflow:hidden;color:var(--pink);clip-path:inset(20% 0 55% 0);transform:translate(-3px,0);animation:gl .5s steps(2,end) 2}
+.glitch.on::after{color:#4cf;clip-path:inset(60% 0 10% 0);transform:translate(3px,0)}
+@keyframes gl{0%{clip-path:inset(20% 0 55% 0)}50%{clip-path:inset(60% 0 5% 0)}100%{clip-path:inset(10% 0 70% 0)}}
+
+/* boot */
+.boot{position:fixed;inset:0;z-index:60;background:var(--bg);display:grid;place-items:center;pointer-events:none;animation:bootOut .5s 2.2s ease forwards}
+.boot div{display:grid;gap:12px;justify-items:center;width:min(320px,80vw)}
+.boot img{width:64px;height:64px;border-radius:50%}
+.boot .bar{width:100%;height:6px;border-radius:999px;background:rgba(255,255,255,.08);overflow:hidden}
+.boot .bar i{display:block;height:100%;width:0;background:var(--green);animation:load 1.6s .2s ease-out forwards}
+.boot span{font-family:var(--mono);font-size:11.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--dim)}
+.boot span b{color:var(--pink);font-weight:500;opacity:0;animation:line .2s 1.7s forwards}
+@keyframes load{to{width:99%}}
+@keyframes line{to{opacity:1}}
+@keyframes bootOut{to{opacity:0;visibility:hidden}}
+
+/* lightbox */
+.lb{position:fixed;inset:0;z-index:70;background:rgba(5,5,7,.92);display:grid;place-items:center;padding:var(--pad);opacity:0;visibility:hidden;transition:opacity .25s,visibility .25s}
+.lb.on{opacity:1;visibility:visible}
+.lb img{max-height:80vh;border-radius:16px;border:1px solid var(--line)}
+.lb .cap{margin-top:12px;font-size:13px;text-align:center;color:var(--white)}
+.lb .x{position:absolute;right:var(--pad);top:var(--pad)}
+
+@media (max-width:980px){
+  .wrap{grid-template-columns:1fr;gap:0}
+  .side{position:relative;height:auto;padding:calc(var(--pad) + 4px) 0 8px;gap:18px}
+  .side .foot{display:none}
+  .mark h1{font-size:clamp(44px,13vw,64px)}
+  .mark p{font-size:14px}
+  .app{margin:8px 0 var(--pad)}
+  .room .fr{object-position:46% 40%}
+  .row2{grid-template-columns:58px 1fr 64px auto;gap:8px;padding:10px 14px}
+  .row2 canvas{width:64px}
+  .row2 .b{display:none}
+  .row2.ours{grid-template-columns:58px 1fr 64px auto}
+  .row2.ours .b{display:inline-flex}
+  .row2:not(.ours){grid-template-columns:58px 1fr 64px}
+  .top .chip span{display:none}
+  .top .chip{padding:0 10px}
+  .ca .ca-val{font-size:20px}
+  .toasts{top:10px}
+}
+@media (prefers-reduced-motion:reduce){*{animation:none !important;transition:none !important}.boot{display:none}}
+</style>
+</head>
+<body>
+
+<div class="boot" aria-hidden="true"><div><img src="assets/avatar.webp" alt="" /><div class="bar"><i></i></div><span>Loading your portfolio <b>· buying temporarily disabled</b></span></div></div>
+
+<div class="room" id="room">
+  <img class="fr f0" src="assets/f0.webp" alt="" />
+  <img class="fr f1" src="assets/f1.webp" alt="" />
+  <img class="fr f2" src="assets/f2.webp" alt="" />
+  <img class="fr f3" src="assets/f3.webp" alt="" />
+  <div class="glowG"></div><div class="glowR"></div><div class="scan"></div><div class="vig"></div><div class="red"></div>
+</div>
+<div class="freeze" id="freeze"><i></i></div>
+<div class="toasts" id="toasts"></div>
+
+<div class="wrap">
+  <aside class="side">
+    <div class="brand"><img src="assets/avatar.webp" alt="" /><span data-name>Pink Wojak</span></div>
+    <div class="mark">
+      <h1 class="glitch" data-t="PINK WOJAK">PINK<br /><em>WOJAK</em></h1>
+      <p>Born on a phone screen in January 2021, same portfolio, new chain</p>
+      <div class="year"><i></i>Account open since 2021 · never closed</div>
+    </div>
+    <div class="foot">Robinhood Chain · Pons · every position red, one green</div>
+  </aside>
+
+  <main class="app" id="app">
+    <div class="top">
+      <div class="who"><img src="assets/avatar.webp" alt="" /><span>Portfolio</span></div>
+      <nav class="btns">
+        <a class="chip buy" data-link="pons" href="https://www.ponsfamily.com/launchpad"><span>Buy</span><svg><use href="#i-pons"/></svg></a>
+        <a class="chip" data-link="x" href="https://x.com" aria-label="X"><svg><use href="#i-x"/></svg></a>
+        <a class="chip" href="/docs"><span>Docs</span></a>
+      </nav>
+    </div>
+
+    <div class="head">
+      <div class="lab">Investing</div>
+      <div class="val" id="val">$48,213.09</div>
+      <div class="chg" id="chg">▼ $31,786.91 (39.7%)<b>All time</b></div>
+    </div>
+    <div class="chart"><canvas id="chart"></canvas><span class="tag" id="ctag">NEW LOW</span></div>
+    <div class="tabs"><button>1D</button><button>1W</button><button>1M</button><button>3M</button><button>1Y</button><button class="on">ALL</button><button class="y">2021</button></div>
+
+    <div class="meter">
+      <div class="row"><span>Pinkness</span><b id="pct">0%</b></div>
+      <div class="bar"><i id="pbar"></i></div>
+    </div>
+
+    <div class="sec">Positions <span id="cnt">9</span></div>
+    <div class="pos" id="pos"></div>
+
+    <div class="sell">
+      <button id="sellAll">Sell everything</button>
+      <div class="n">Orders rejected <b id="rej">0</b> · buying temporarily disabled</div>
+    </div>
+
+    <div class="sec">History <span>2021 → now</span></div>
+    <div class="hist">
+      <div class="h" data-src="assets/s2.webp" data-cap="January 2021, he bought the top from the kitchen"><img src="assets/s2.webp" alt="" /><small>JAN 2021</small><span>He bought the top from the kitchen</span></div>
+      <div class="h" data-src="assets/s3.webp" data-cap="The buy button turned grey, the sell button stayed green"><img src="assets/s3.webp" alt="" /><small>JAN 28</small><span>The buy button turned grey</span></div>
+      <div class="h" data-src="assets/s4.webp" data-cap="Sunrise, still holding, still pink"><img src="assets/s4.webp" alt="" /><small>EVERY MORNING</small><span>Still holding, still pink</span></div>
+      <div class="h" data-src="assets/s5.webp" data-cap="The line for the new chain, he is at the front"><img src="assets/s5.webp" alt="" /><small>NOW</small><span>First in line for the new chain</span></div>
+    </div>
+
+    <div class="ticket" id="ticket">
+      <div class="lab">Order ticket · the one green position</div>
+      <div class="ca" id="ca"><span class="tag">CONTRACT</span><b class="ca-val" id="caVal">soon</b><button class="cp" id="caCopy">[ COPY ]</button></div>
+      <div class="btns">
+        <a class="chip buy" data-link="pons" href="https://www.ponsfamily.com/launchpad">Buy on Pons<svg><use href="#i-pons"/></svg></a>
+        <a class="chip" data-link="x" href="https://x.com" aria-label="X"><svg><use href="#i-x"/></svg></a>
+        <a class="chip" href="/docs">Docs</a>
+      </div>
+    </div>
+    <div class="end"><span data-name>Pink Wojak</span><span>Robinhood Chain · Pons · 2021</span></div>
+  </main>
+</div>
+
+<div class="lb" id="lb"><div><img id="lbImg" src="" alt="" /><div class="cap" id="lbCap"></div></div><button class="chip x" id="lbX">Close</button></div>
+
+<audio id="bgm" src="assets/music.mp3" loop preload="none"></audio>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-pons" viewBox="0 0 64 64"><path d="M14 8h24c11 0 18 7 18 17s-7 17-18 17h-9v12a3 3 0 0 1-3 3H17a3 3 0 0 1-3-3V11a3 3 0 0 1 3-3z" fill="currentColor"/><path d="M29 20h8c4 0 6.5 2 6.5 5s-2.5 5-6.5 5h-8z" fill="#fff" opacity=".9"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><path fill="currentColor" d="M18.9 2H22l-7.1 8.1L23 22h-6.6l-5.2-6.8L5.3 22H2.1l7.6-8.7L1.5 2h6.7l4.7 6.2L18.9 2zm-1.1 18h1.8L7.3 3.9H5.4L17.8 20z"/></symbol>
+</svg>
+
+<script>
+(function(){
+  var S = window.SITE, CA = (S.CA||"SOON").trim(), HAS_CA = CA !== "SOON" && CA !== "";
+  document.querySelectorAll('[data-name]').forEach(function(e){ e.textContent = S.NAME; });
+  document.title = S.NAME;
+  document.querySelectorAll('[data-link="pons"]').forEach(function(a){ a.href = HAS_CA ? window.PONS_HOME + '/' + CA : window.PONS_HOME; a.target='_blank'; a.rel='noopener'; });
+  document.querySelectorAll('[data-link="x"]').forEach(function(a){ a.href = S.X_URL || 'https://x.com'; a.target='_blank'; a.rel='noopener'; });
+  var caBox = document.getElementById('ca'), caVal = document.getElementById('caVal'), caCopy = document.getElementById('caCopy');
+  caVal.textContent = HAS_CA ? CA : 'soon';
+  if(HAS_CA){ caBox.classList.add('live'); caBox.title = CA; }
+  caBox.addEventListener('click', function(){ var old = caCopy.textContent; if(HAS_CA){ if(navigator.clipboard) navigator.clipboard.writeText(CA); caCopy.textContent = '[ COPIED ]'; } else { caCopy.textContent = '[ NOT YET ]'; } setTimeout(function(){ caCopy.textContent = old; }, 1400); });
+
+  var bgm = document.getElementById('bgm'), armed = false, hasMusic = true;
+  bgm.addEventListener('error', function(){ hasMusic = false; });
+  function arm(){ if(armed) return; armed = true; if(hasMusic){ bgm.volume = .3; bgm.play().catch(function(){}); } }
+  document.addEventListener('pointerdown', arm, true); document.addEventListener('keydown', arm, true);
+  var boot = document.querySelector('.boot'); setTimeout(function(){ if(boot) boot.remove(); }, 2900);
+
+  /* ---- pain ---- */
+  var pain = 0, extra = 0, root = document.documentElement, frames = [].slice.call(document.querySelectorAll('.room .fr')), pbar = document.getElementById('pbar'), pct = document.getElementById('pct'), app = document.getElementById('app'), ticket = document.getElementById('ticket');
+  function setPain(){
+    var r = app.getBoundingClientRect(), total = Math.max(1, r.height - innerHeight * .6), sc = Math.min(1, Math.max(0, -r.top / total));
+    pain = Math.min(1, sc * .8 + extra);
+    root.style.setProperty('--pain', pain.toFixed(3));
+    frames.forEach(function(f, i){ if(i === 0) return; f.style.opacity = Math.min(1, Math.max(0, pain * 3 - (i - 1))); });
+    pbar.style.width = Math.round(pain * 100) + '%'; pct.textContent = Math.round(pain * 100) + '%';
+  }
+  addEventListener('scroll', setPain, { passive: true }); addEventListener('resize', setPain); setPain();
+
+  /* ---- portfolio value + chart ---- */
+  var val = document.getElementById('val'), chg = document.getElementById('chg'), ctag = document.getElementById('ctag'), v = 48213.09, start = 80000, low = v;
+  var cv = document.getElementById('chart'), cx = cv.getContext('2d'), pts = [], N = 160;
+  for(var i = 0; i < N; i++) pts.push(.35 + i / N * .3 + (Math.random() - .5) * .04);
+  function fmt(n){ return '$' + n.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 }); }
+  function drawChart(){
+    var w = cv.clientWidth, h = cv.clientHeight; if(cv.width !== w * 2 || cv.height !== h * 2){ cv.width = w * 2; cv.height = h * 2; } cx.setTransform(2, 0, 0, 2, 0, 0); cx.clearRect(0, 0, w, h);
+    var g = cx.createLinearGradient(0, 0, 0, h); g.addColorStop(0, 'rgba(255,80,0,' + (.25 + pain * .3) + ')'); g.addColorStop(1, 'rgba(255,80,0,0)');
+    cx.beginPath(); pts.forEach(function(p, i){ var x = i / (N - 1) * w, y = p * h; i ? cx.lineTo(x, y) : cx.moveTo(x, y); }); cx.lineTo(w, h); cx.lineTo(0, h); cx.closePath(); cx.fillStyle = g; cx.fill();
+    cx.beginPath(); pts.forEach(function(p, i){ var x = i / (N - 1) * w, y = p * h; i ? cx.lineTo(x, y) : cx.moveTo(x, y); }); cx.strokeStyle = pain > .6 ? '#ff5fa8' : '#ff5000'; cx.lineWidth = 2; cx.stroke();
+    var lx = w, ly = pts[N - 1] * h; cx.beginPath(); cx.arc(lx - 1, ly, 3.5, 0, Math.PI * 2); cx.fillStyle = '#fff'; cx.fill();
+  }
+  function tick(){
+    var drop = (Math.random() * 40 + 3) * (1 + pain * 4), up = Math.random() < .28 ? Math.random() * 30 : 0;
+    v = v - drop + up; if(v < 900){ v = 48213.09; pts = pts.map(function(){ return .4; }); glitchNow(); }
+    var last = pts[N - 1], next = last + (drop - up) / 12000 + (Math.random() - .5) * .02; next = Math.max(.05, Math.min(.96, next));
+    pts.push(next); pts.shift();
+    if(next >= .94){ ctag.classList.add('on'); setTimeout(function(){ ctag.classList.remove('on'); }, 1200); pts = pts.map(function(p){ return p - .35; }); }
+    val.textContent = fmt(v); val.style.color = pain > .6 ? '#ff5fa8' : '#f4f4f7';
+    var d = start - v; chg.innerHTML = '▼ ' + fmt(d) + ' (' + (d / start * 100).toFixed(1) + '%)<b>All time</b>';
+    drawChart();
+  }
+  setInterval(tick, 320); addEventListener('resize', drawChart); drawChart();
+
+  /* ---- positions ---- */
+  var rows = [
+    ['GME', 'Bought the top, kept the shares', 48.21, -71.4], ['NVDA', 'Bought after the split, still after', 118.40, -12.9], ['TSLA', 'Averaged down four times', 214.70, -38.2],
+    ['AMC', 'The other one from 2021', 3.12, -88.1], ['SPY', 'Was supposed to be the safe one', 512.30, -4.6], ['GLD', 'Bought gold the day it topped', 226.10, -6.3],
+    ['HIMS', 'A friend said it was a sure thing', 19.05, -44.0], ['DOGE', 'For the memes, lost like the rest', 0.11, -77.5]
+  ];
+  var pos = document.getElementById('pos'), sparks = [];
+  rows.forEach(function(r){
+    var el = document.createElement('div'); el.className = 'row2';
+    el.innerHTML = '<div class="t">' + r[0] + '<small>' + r[1] + '</small></div><canvas></canvas><div class="p">' + fmt(r[2]) + '<small>' + r[3].toFixed(1) + '%</small></div><button class="b">Buy</button>';
+    pos.appendChild(el); var c = el.querySelector('canvas'), arr = []; for(var i = 0; i < 40; i++) arr.push(.2 + i / 40 * .5 + (Math.random() - .5) * .18); sparks.push({ c: c, a: arr, el: el, base: r[3] });
+  });
+  var ours = document.createElement('div'); ours.className = 'row2 ours';
+  ours.innerHTML = '<div class="t">' + S.TICKER + '<small>Robinhood Chain, the green one</small></div><canvas></canvas><div class="p">soon<small>+∞%</small></div><a class="b" data-link="pons" href="https://www.ponsfamily.com/launchpad">Buy</a>';
+  pos.appendChild(ours); var oa = []; for(var j = 0; j < 40; j++) oa.push(.8 - j / 40 * .6 + (Math.random() - .5) * .1);
+  ours.querySelector('a').href = HAS_CA ? window.PONS_HOME + '/' + CA : window.PONS_HOME; ours.querySelector('a').target = '_blank';
+  function drawSpark(c, arr, color){ var w = c.clientWidth, h = c.clientHeight; if(!w) return; if(cv.width !== w * 2) {} c.width = w * 2; c.height = h * 2; var g = c.getContext('2d'); g.setTransform(2, 0, 0, 2, 0, 0); g.beginPath(); arr.forEach(function(p, i){ var x = i / (arr.length - 1) * w, y = p * h; i ? g.lineTo(x, y) : g.moveTo(x, y); }); g.strokeStyle = color; g.lineWidth = 1.5; g.stroke(); }
+  function sparksTick(){ sparks.forEach(function(s){ s.a.push(Math.min(.95, s.a[s.a.length - 1] + Math.random() * .04 * (1 + pain * 2) - .01)); s.a.shift(); drawSpark(s.c, s.a, '#ff5000'); s.el.querySelector('.p small').textContent = (s.base - pain * 9).toFixed(1) + '%'; }); drawSpark(ours.querySelector('canvas'), oa, '#00c805'); }
+  setInterval(sparksTick, 900); sparksTick();
+
+  /* ---- sell ---- */
+  var sellBtn = document.getElementById('sellAll'), rej = document.getElementById('rej'), rejN = 0;
+  var sellLines = ['Your sell order could not be placed', 'Market is closed for you specifically', 'Sell button is thinking about it', 'Order rejected, try holding', 'Selling is temporarily disabled too'];
+  sellBtn.addEventListener('click', function(){ sellBtn.classList.remove('shake'); void sellBtn.offsetWidth; sellBtn.classList.add('shake'); rejN++; rej.textContent = rejN; extra = Math.min(.5, extra + .1); setPain(); toast('Order rejected', sellLines[rejN % sellLines.length]); freeze(600); glitchNow(); });
+  document.querySelectorAll('.row2:not(.ours) .b').forEach(function(b){ b.addEventListener('click', function(){ toast('Buying temporarily disabled', 'This asset cannot be bought right now'); }); });
+
+  /* ---- toasts, freeze, glitch ---- */
+  var toasts = document.getElementById('toasts');
+  function toast(t, m){ var el = document.createElement('div'); el.className = 'toast'; el.innerHTML = '<img src="assets/avatar.webp" alt="" /><div><b></b><span></span></div>'; el.querySelector('b').textContent = t; el.querySelector('span').textContent = m; toasts.appendChild(el); setTimeout(function(){ el.classList.add('out'); setTimeout(function(){ el.remove(); }, 320); }, 3200); while(toasts.children.length > 3) toasts.firstChild.remove(); }
+  var auto = [['Buying temporarily disabled', 'You can still sell, in theory'], ['Pattern day trader', 'You have made zero trades, flagged anyway'], ['Margin call', 'Deposit funds to keep losing'], ['Account notice', 'Your positions are red, this is not a bug'], ['Reminder', 'It has been 4 years, still holding'], ['Price alert', 'Everything is lower than yesterday']], ai = 0;
+  setTimeout(function loop(){ toast(auto[ai % auto.length][0], auto[ai % auto.length][1]); ai++; setTimeout(loop, 7000 + Math.random() * 6000); }, 5000);
+  var fz = document.getElementById('freeze');
+  function freeze(ms){ fz.classList.add('on'); setTimeout(function(){ fz.classList.remove('on'); }, ms); }
+  var gl = document.querySelector('.glitch');
+  function glitchNow(){ gl.classList.remove('on'); void gl.offsetWidth; gl.classList.add('on'); setTimeout(function(){ gl.classList.remove('on'); }, 1100); }
+  setInterval(function(){ if(pain > .45 && Math.random() < .5) glitchNow(); if(pain > .7 && Math.random() < .3) freeze(350); }, 4000);
+
+  /* ---- lightbox ---- */
+  var lb = document.getElementById('lb'), lbImg = document.getElementById('lbImg'), lbCap = document.getElementById('lbCap');
+  document.querySelectorAll('.hist .h').forEach(function(c){ c.addEventListener('click', function(){ lbImg.src = c.dataset.src; lbCap.textContent = c.dataset.cap; lb.classList.add('on'); }); });
+  function close(){ lb.classList.remove('on'); }
+  document.getElementById('lbX').addEventListener('click', close); lb.addEventListener('click', function(e){ if(e.target === lb) close(); });
+  document.addEventListener('keydown', function(e){ if(e.key === 'Escape') close(); });
+  window.__pw = { setExtra: function(x){ extra = x; setPain(); }, pain: function(){ return pain; } };
+})();
+</script>
+</body>
+</html>
